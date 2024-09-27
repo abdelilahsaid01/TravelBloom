@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../components/nav.css">
+    <title>Document</title>
+    <style>
+        /* Home page specific styles */
+        header {
+            text-align: center;
+            padding: 4rem 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            background-size: cover;
+            background-position: center;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        header p {
+            font-size: 1.5rem;
+        }
+
+        .social-media {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .social-media a {
+            margin: 0 1rem;
+            color: #333;
+            font-size: 2rem;
+        }
+
+        .social-media a:hover {
+            color: #ff9800;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <h1>TravelBloom</h1>
+        <ul>
+            <li><a href="./home.html" id="home">Home </a></li>
+            <li><a href="./about.html" id="contact">About Us </a></li>
+            <li><a href="./contact.html" id="contact">Contact Us </a></li>
+            <input type="text" placeholder="Search for recommendations" id="search-bar">
+            <button id="search-btn">Search</button>
+            <button id="reset-btn">Reset</button>
+        </ul>
+    </nav>
+    <header>
+        <h1>Welcome to TravelBloom</h1>
+        <p>Your guide to the best travel recommendations.</p>
+    </header>
+    <div style="margin: 20px;" id="results-container"></div>
+    <div class="social-media">
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+    </div>
+
+
+    <script>
+        // Event listeners for search and reset buttons
+        document.getElementById('search-btn').addEventListener('click', handleSearch);
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            document.getElementById('search-bar').value = ''; // Clear the search bar
+            document.getElementById('results-container').innerHTML = ''; // Clear results
+        });
+
+
+        // Function to handle search
+        function handleSearch() {
+            // Get the value from the search bar and convert it to lowercase
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+
+            // Fetch the travel data from the JSON file
+            fetch('../travel_recommendation_api.json') // Path to your JSON file
+                .then(response => response.json())
+                .then(data => {
+                    // Initialize an empty array to hold the matched results
+                    let results = [];
+
+                    // Check if the search term matches 'beach' or any variation
+                    if (searchTerm.includes('beach')) {
+                        results = data.beaches;
+                    }
+                    // Check if the search term matches 'temple' or any variation
+                    else if (searchTerm.includes('temple')) {
+                        results = data.temples;
+                    }
+                    // Check if the search term matches 'country' or any specific country names
+                    else {
+                        data.countries.forEach(country => {
+                            if (country.name.toLowerCase().includes(searchTerm)) {
+                                results = results.concat(country.cities);
+                            }
+                        });
+                    }
+
+                    // Display the matched results
+                    displayResults(results);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        // Function to display results
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<p>No recommendations found.</p>';
+            } else {
+                results.forEach(result => {
+                    // Create result card elements
+                    const resultCard = document.createElement('div');
+                    resultCard.classList.add('result-card');
+
+                    const image = document.createElement('img');
+                    image.src = `../img/${result.imageUrl}`; // Updated to match your img folder path
+                    image.alt = result.name;
+                    image.width = 300;
+
+                    const title = document.createElement('h3');
+                    title.textContent = result.name;
+
+                    const description = document.createElement('p');
+                    description.textContent = result.description;
+
+                    // Append elements to the result card
+                    resultCard.appendChild(image);
+                    resultCard.appendChild(title);
+                    resultCard.appendChild(description);
+
+                    // Append the result card to the results container
+                    resultsContainer.appendChild(resultCard);
+                });
+            }
+        }
+
+    </script>
+</body>
+
+</html>
