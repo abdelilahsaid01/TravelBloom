@@ -99,12 +99,22 @@
                     }
                     // Check if the search term matches 'country' or any specific country names
                     else {
-                        data.countries.forEach(country => {
-                            if (country.name.toLowerCase().includes(searchTerm)) {
+                        // Check if the search term matches 'country'
+                        if (searchTerm.includes('countr')) {
+                            // Loop through all countries and add their cities to the results
+                            data.countries.forEach(country => {
                                 results = results.concat(country.cities);
-                            }
-                        });
-                    }
+                            });
+                        }
+                        // Check if the search term matches any specific country names
+                        else {
+                            data.countries.forEach(country => {
+                                if (country.name.toLowerCase().includes(searchTerm)) {
+                                    results = results.concat(country.cities);
+                                }
+                            });
+                        }
+                           }
 
                     // Display the matched results
                     displayResults(results);
